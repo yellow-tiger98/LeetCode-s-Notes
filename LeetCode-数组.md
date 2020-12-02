@@ -162,3 +162,177 @@ public class Test02 {
 }
 ```
 
+## 4.旋转矩阵
+
+给你一幅由 `N × N` 矩阵表示的图像，其中每个像素的大小为 4 字节。请你设计一种算法，将图像旋转 90 度。
+
+不占用额外内存空间能否做到？
+
+```java
+public class Test03 {
+    public static void rotate(int[][] matrix) {
+        //获取数组长度
+        int size = matrix.length;
+        //创建替换数组
+        int[][] newArr = new int[size][size];
+        //初始化右边索引
+        int right = 0;
+        //反向遍历数组
+        for(int i=size-1;i>=0;i--){
+            //初始化左边索引
+            int left = 0;
+            for(int j=0;j<size;j++){
+                newArr[left][right] = matrix[i][j];
+                left++;
+            }
+            right ++;
+        }
+        //替换数组为反转90度后的数组
+        matrix = newArr;
+    }
+}
+```
+
+## 5.零矩阵
+
+编写一种算法，若M × N矩阵中某个元素为0，则将其所在的行与列清零。
+
+> 示例 1：
+>
+> 输入：
+> [
+>   [1,1,1],
+>   [1,0,1],
+>   [1,1,1]
+> ]
+> 输出：
+> [
+>   [1,0,1],
+>   [0,0,0],
+>   [1,0,1]
+> ]
+
+> 示例 2：
+>
+> 输入：
+> [
+>   [0,1,2,0],
+>   [3,4,5,2],
+>   [1,3,1,5]
+> ]
+> 输出：
+> [
+>   [0,0,0,0],
+>   [0,4,5,0],
+>   [0,3,1,0]
+> ]
+
+```java
+public class Test04 {
+    public void setZeroes(int[][] matrix) {
+      	// 用于存储要清零的行与列，以数组的形式存储
+        List<int[]> deleteList = new ArrayList<>();
+      	// 遍历数组，找出哪些行列中含有0
+        for(int i=0;i<matrix.length;i++){
+            for(int j=0;j<matrix[i].length;j++){
+                if(matrix[i][j]==0){
+                    int[] arr = {i,j};
+                    deleteList.add(arr);
+                }
+            }
+        }
+        if(deleteList!=null&&deleteList.size()>0){
+            for(int[] arr : deleteList){
+                int row = arr[0];
+                int column = arr[1];
+                //替换行元素为0
+                for(int i=0;i<matrix[row].length;i++){
+                    matrix[row][i] = 0;
+                }
+                //替换列元素为0
+                for(int j=0;j<matrix.length;j++){
+                    matrix[j][column] = 0;
+                }
+            }
+        }
+    }
+}
+```
+
+## 6.对角线遍历
+
+给定一个含有 M x N 个元素的矩阵（M 行，N 列），请以对角线遍历的顺序返回这个矩阵中的所有元素，对角线遍历如下图所示。
+
+> 示例:
+>
+> 输入:
+> [
+>  [ 1, 2, 3 ],
+>  [ 4, 5, 6 ],
+>  [ 7, 8, 9 ]
+> ]
+>
+> 输出:  [1,2,4,7,5,3,6,8,9]
+>
+> 解释:
+>
+> ![](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/10/12/diagonal_traverse.png)
+
+```java
+public class Test05 {
+    public int[] findDiagonalOrder(int[][] matrix) {
+        // 为空处理
+        if(matrix.length==0){
+            return new int[0];
+        }
+        if(matrix[0].length==0){
+            return new int[0];
+        }
+        // x坐标的最大边界
+        int rowLength = matrix.length;
+        // y坐标的最大边界
+        int columnLength = matrix[0].length;
+        // 初始化结果数组
+        int[] result = new int[rowLength*columnLength];
+        //遍历次数
+        int count = rowLength+columnLength-1;
+        int x = 0;
+        int y = 0;
+        int answerIndex = 0;
+
+        for(int i = 0;i<count;i++){
+            if(i %2 == 0){ // 下一步内容 右上方
+                while (x >=0 && y < columnLength) {
+                    result[answerIndex] = matrix[x][y];
+                    answerIndex++;
+                    x--; // 向右上移，x坐标减1
+                    y++; // 向右上移，y坐标加1
+                }
+              	// 遍历完后考虑边界情况
+                if(y < columnLength){// 当y小于最大长度时，x坐标偏移1，如[0,0]-->[-1,1]-->[0,1]
+                    x++;
+                }else{// 当y大于或等于最大长度时，x坐标偏移2，y坐标偏移1，如[0,2]-->[-1,3]-->[1,2]
+                    x = x+2;
+                    y--;
+                }
+            }else{ // 下一步内容 左下方
+                while(x<rowLength&&y>=0){
+                    result[answerIndex] = matrix[x][y];
+                    answerIndex++;
+                    x++; // 向左下移，x坐标加1
+                    y--; // 向左下移，y坐标减1
+                }
+              	// 遍历完后考虑边界情况
+                if(x<rowLength){ //当x小于最小长度时，表示y坐标偏移1，如[1,0]-->[2,-1]-->[2,0]
+                    y++;
+                }else{ //当x大于最大长度时，表示y左边偏移2，x坐标偏移1，如[2,1]-->[3,0]-->[2,2]
+                    x--;
+                    y=y+2;
+                }
+            }
+        }
+        return result;
+    }
+}
+```
+
